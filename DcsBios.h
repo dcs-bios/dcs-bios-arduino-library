@@ -178,17 +178,17 @@ class StringBuffer : ExportStreamListener {
 			if (address_ + LENGTH > (address+1))
 				setChar(address - address_ + 1, ((char*)&value)[1]);
 			}
+			if (address == 0xfffe) {
+				if (dirty_) {
+					callback_(buffer);
+					dirty_ = false;
+				}
+			}
 		}
 		void setChar(unsigned int index, unsigned char value) {
 			if (buffer[index] == value) return;
 			buffer[index] = value;
 			dirty_ = true;
-		}
-		void onDcsBiosFrameSync() {
-			if (dirty_) {
-				callback_(buffer);
-				dirty_ = false;
-			}
 		}
 		unsigned int address_;
 		bool dirty_;
