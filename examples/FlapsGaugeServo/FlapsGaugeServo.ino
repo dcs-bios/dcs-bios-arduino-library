@@ -8,7 +8,7 @@ DcsBios::ProtocolParser parser;
 DcsBios::ServoOutput flapPos(0x10a0, 5, 544, 2400);
 
 void setup() {
-  Serial.begin(500000);
+  Serial.begin(250000);
 }
 
 /*
@@ -20,10 +20,11 @@ to detect changes in the state of connected controls and
 pass them on to DCS.
 */
 void loop() {
-  return;
   // feed incoming data to the parser
-  while (Serial.available()) {
-      parser.processChar(Serial.read());
+  int data = Serial.read();
+  while (data > -1) {
+      parser.processChar(data);
+      data = Serial.read();
   }
   
   // poll inputs
