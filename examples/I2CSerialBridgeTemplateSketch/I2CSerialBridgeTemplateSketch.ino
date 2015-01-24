@@ -15,7 +15,7 @@
 DcsBios::ProtocolParser parser;
 
 void setup() {
-  Serial.begin(500000);
+  Serial.begin(250000);
   Wire.begin(8);
   Wire.onReceive(onI2CReceive);
 }
@@ -33,8 +33,10 @@ stream to the parser object you instantiated above.
 */
 void loop() {
   // feed incoming data to the parser
-  while (Serial.available()) {
-      parser.processChar(Serial.read());
+  int data = Serial.read();
+  while (data > -1) {
+      parser.processChar(data);
+      data = Serial.read();
   }
   
   // don't bother polling inputs
