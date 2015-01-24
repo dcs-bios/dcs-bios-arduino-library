@@ -1,7 +1,6 @@
 #ifndef __DCSBIOS_H
 #define __DCSBIOS_H
 
-#include "Arduino.h"
 #include "Protocol.h"
 #include "Buttons.h"
 #include "Switches.h"

@@ -6,17 +6,16 @@
 #include <Servo.h>
 
 namespace DcsBios {
-	class ServoOutput : ExportStreamListener {
+	class ServoOutput : IntegerBuffer {
 		private:
-			void onDcsBiosWrite(unsigned int address, unsigned int value);
+			void onDcsBiosFrameSync();
 			Servo servo_;
-			unsigned int address_;
 			char pin_;
 			int minPulseWidth_;
 			int maxPulseWidth_;
 		public:
 			ServoOutput(unsigned int address, char pin, int minPulseWidth, int maxPulseWidth);
-			ServoOutput(unsigned int address, char pin) { ServoOutput(address, pin, 544, 2400); }
+			ServoOutput(unsigned int address, char pin);
 	};
 }
 

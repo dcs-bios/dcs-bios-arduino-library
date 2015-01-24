@@ -52,25 +52,34 @@ namespace DcsBios {
 		case DCSBIOS_STATE_DATA_HIGH:
 			data = (c << 8) | data;
 			count--;
-			onDcsBiosWrite(address, data);
 			ExportStreamListener::handleDcsBiosWrite(address, data);
-			address += 2;
-			if (count == 0)
+			if (count == 0) {
 				state = DCSBIOS_STATE_ADDRESS_LOW;
-			else
+
+				// Frame sync moved to end of frame.  All time consumeing updates should
+				// be handled in framesync during the down time between frame transmissions.
+				// TODO: We should detect waiting bytes in serial buffer and skip frame sync
+				// if more data is waiting.
+				if (address == 0xfffe) {
+					onDcsBiosFrameSync();
+					ExportStreamListener::handleDcsBiosFrameSync();
+				}
+			} else {
+				address += 2;
 				state = DCSBIOS_STATE_DATA_LOW;
+			}
 			break;
 	  }
 
-	  if (c == 0x55)
+	  if (c == 0x55) {
 		sync_byte_count++;
-	  else
+	  } else {
 		sync_byte_count = 0;
+	  }
 	  
 	  if (sync_byte_count == 4) {
 		state = DCSBIOS_STATE_ADDRESS_LOW;
-		sync_byte_count = 0;
-		ExportStreamListener::handleDcsBiosFrameSync();
+		sync_byte_count = 0;		
 	  }
 	  
 	}

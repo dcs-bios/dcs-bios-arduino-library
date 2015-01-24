@@ -6,12 +6,10 @@
 
 namespace DcsBios {
 
-	class LED : ExportStreamListener {
+	class LED : IntegerBuffer {
 		private:
-			void onDcsBiosWrite(unsigned int address, unsigned int value);
+			void onDcsBiosFrameSync();
 			unsigned char pin_;
-			unsigned int address_;
-			unsigned int mask_;
 		public:
 			LED(unsigned int address, unsigned int mask, char pin);
 	};
