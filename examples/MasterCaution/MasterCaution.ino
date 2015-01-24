@@ -10,7 +10,7 @@ DcsBios::Switch2Pos masterCautionBtn("UFC_MASTER_CAUTION", 10);
 DcsBios::LED mcLed(0x1012, 0x0800, 13);
 
 void setup() {
-  Serial.begin(500000);
+  Serial.begin(250000);
 }
 
 /*
@@ -23,8 +23,10 @@ pass them on to DCS.
 */
 void loop() {
   // feed incoming data to the parser
-  while (Serial.available()) {
-      parser.processChar(Serial.read());
+  int data = Serial.read();
+  while (data > -1) {
+      parser.processChar(data);
+      data = Serial.read();
   }
   
   // poll inputs

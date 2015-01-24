@@ -12,7 +12,7 @@ DcsBios::ProtocolParser parser;
 
 void setup() {
   Wire.begin();
-  Serial.begin(500000);
+  Serial.begin(250000);
 }
 
 /*
@@ -25,8 +25,10 @@ pass them on to DCS.
 */
 void loop() {
   // feed incoming data to the parser
-  while (Serial.available()) {
-      parser.processChar(Serial.read());
+  int data = Serial.read();
+  while (data > -1) {
+      parser.processChar(data);
+      data = Serial.read();
   }
   
   // poll inputs
