@@ -38,8 +38,6 @@ namespace DcsBios {
 				if ((address >= address_) && (endAddress_ > address)) {
 					unsigned int index = address - address_;
 					buffer[index] = ((char*)&value)[0];
-					// No reason to check index here. We allocate an extra byte for zero termination
-					// and Export protocol pads odd length strings with a 0.
 					index++;
 					if (LENGTH > index) {
 						buffer[index] = ((char*)&value)[1];
