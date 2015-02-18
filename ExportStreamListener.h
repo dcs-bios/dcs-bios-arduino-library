@@ -71,10 +71,14 @@ namespace DcsBios {
 	};
 
 	class IntegerBuffer : ExportStreamListener {
-		private:
+		protected:
 			void onDcsBiosWrite(unsigned int address, unsigned int value) {
 				if (address == address_) {
-					data = (value & mask_) >> shift_;
+					unsigned int newValue = (value & mask_) >> shift_;
+					if( newValue != data ) {
+						data = newValue;
+						dirty_ = true;
+					}
 				}
 			}
 			unsigned int address_;
@@ -97,6 +101,31 @@ namespace DcsBios {
 			}
 	};
 	
+	class MappedIntegerBuffer : public IntegerBuffer {
+		private:
+			void onDcsBiosWrite(unsigned int address, unsigned int value) {
+				if (address == address_) {
+					unsigned int newValue = map(( value & mask_ ) >> shift_, fromLo_, fromHi_, toLo_, toHi_);
+					if(newValue != data) {
+						data = newValue;
+						dirty_ = true;
+					}
+				}
+			}
+			unsigned int fromLo_;
+			unsigned int fromHi_;
+			unsigned int toLo_;
+			unsigned int toHi_;
+		public:
+			MappedIntegerBuffer(unsigned int address, unsigned int mask, unsigned char shift, unsigned int fromLo=0, unsigned fromHi=65535, unsigned int toLo=0, unsigned int toHi=65535) :
+				IntegerBuffer(address, mask, shift) {
+				fromLo_ = fromLo;
+				fromHi_ = fromHi;
+				toLo_ = toLo;
+				toHi_ = toHi;
+			}
+	};
+
 }
 
 #endif
