@@ -1,8 +1,14 @@
 #include <DcsBios.h>
 #include <Servo.h>
+#include <LiquidCrystal.h>
 
 /**** Make your changes after this line ****/
 
+// LCD Display
+LiquidCrystal lcd(22, 24, 26, 28, 30, 32);
+
+// Huey Radar Alt
+DcsBios::StringBuffer<4> raltDisplayBuffer(0x14aa);
 
 /**** In most cases, you do not have to change anything below this line ****/
 
@@ -10,7 +16,12 @@
 DcsBios::ProtocolParser parser;
 
 void setup() {
-  Serial.begin(250000);
+  Serial.begin(500000);
+  
+  // Set up the LCD
+  lcd.clear();
+  lcd.setCursor(0,0);
+  lcd.print("ALT:");
 }
 
 /*
@@ -62,5 +73,10 @@ Use this to handle object updates which are not covered by the
 DcsBios Arduino library (e.g. displays).
 */
 void onDcsBiosFrameSync() {
-
+  // Radar Alt
+  if(raltDisplayBuffer.isDirty()) {
+    lcd.setCursor(4,0);
+    lcd.print(raltDisplayBuffer.buffer);
+    raltDisplayBuffer.clearDirty();
+  }
 }
