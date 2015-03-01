@@ -169,10 +169,15 @@ SwitchMultiPos::SwitchMultiPos(char* msg, const byte* pins, char numberOfPins) {
 }
 char SwitchMultiPos::readState() {
 	char i;
+	char defaultPin = 0;
 	for (i=0; i<numberOfPins_; i++) {
-		if (digitalRead(pins_[i]) == LOW) return i;
+		if (pins_[i] == 255) {
+			defaultPin = i;
+		} else if (digitalRead(pins_[i]) == LOW) {
+			return i;
+		}
 	}
-	return 0;
+	return defaultPin;
 }
 void SwitchMultiPos::pollInput() {
 	char state = readState();
