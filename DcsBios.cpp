@@ -92,31 +92,39 @@ void ActionButton::pollInput() {
 	lastState_ = state;
 }
 
-Switch2Pos::Switch2Pos(char* msg, char pin) {
+Switch2Pos::Switch2Pos(char* msg, char pin, bool reverse) {
 	msg_ = msg;
 	pin_ = pin;
 	pinMode(pin_, INPUT_PULLUP);
 	lastState_ = digitalRead(pin_);
+	reverse_ = reverse;
 }
 void Switch2Pos::pollInput() {
 	char state = digitalRead(pin_);
+	if (reverse_) state = !state;
 	if (state != lastState_) {
 		sendDcsBiosMessage(msg_, state == HIGH ? "0" : "1");
 	}
 	lastState_ = state;
 }
 
-Switch3Pos::Switch3Pos(char* msg, char pinA, char pinB) {
+Switch3Pos::Switch3Pos(char* msg, char pinA, char pinB, bool reverse) {
 	msg_ = msg;
 	pinA_ = pinA;
 	pinB_ = pinB;
 	pinMode(pinA_, INPUT_PULLUP);
 	pinMode(pinB_, INPUT_PULLUP);
 	lastState_ = readState();
+	reverse_ = reverse;
 }
 char Switch3Pos::readState() {
-	if (digitalRead(pinA_) == LOW) return 0;
-	if (digitalRead(pinB_) == LOW) return 2;
+	if (reverse_) {
+		if (digitalRead(pinA_) == LOW) return 2;
+		if (digitalRead(pinB_) == LOW) return 0;
+	} else {
+		if (digitalRead(pinA_) == LOW) return 0;
+		if (digitalRead(pinB_) == LOW) return 2;
+	}
 	return 1;
 }
 void Switch3Pos::pollInput() {
