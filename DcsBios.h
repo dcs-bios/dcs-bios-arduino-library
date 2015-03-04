@@ -94,9 +94,10 @@ class Switch2Pos : PollingInput {
 		char pin_;
 		char lastState_;
 		bool reverse_;
+		void init_(char* msg, char pin, bool reverse);
 	public:
-		Switch2Pos(char* msg, char pin, bool reverse);
-		Switch2Pos(char* msg, char pin) { Switch2Pos(msg, pin, false); }
+		Switch2Pos(char* msg, char pin, bool reverse) { init_(msg, pin, reverse); }
+		Switch2Pos(char* msg, char pin) { init_(msg, pin, false); }
 };
 
 class Switch3Pos : PollingInput {
@@ -108,9 +109,10 @@ class Switch3Pos : PollingInput {
 		char lastState_;
 		char readState();
 		bool reverse_;
+		void init_(char* msg, char pinA, char pinB, bool reverse);
 	public:
-		Switch3Pos(char* msg, char pinA, char pinB, bool reverse);
-		Switch3Pos(char* msg, char pinA, char pinB) { Switch3Pos(msg, pinA, pinB, false); }
+		Switch3Pos(char* msg, char pinA, char pinB, bool reverse) { init_(msg, pinA, pinB, reverse); }
+		Switch3Pos(char* msg, char pinA, char pinB) { init_(msg, pinA, pinB, false); }
 };
 
 class SwitchMultiPos : PollingInput {

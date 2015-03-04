@@ -92,7 +92,7 @@ void ActionButton::pollInput() {
 	lastState_ = state;
 }
 
-Switch2Pos::Switch2Pos(char* msg, char pin, bool reverse) {
+void Switch2Pos::init_(char* msg, char pin, bool reverse) {
 	msg_ = msg;
 	pin_ = pin;
 	pinMode(pin_, INPUT_PULLUP);
@@ -108,7 +108,7 @@ void Switch2Pos::pollInput() {
 	lastState_ = state;
 }
 
-Switch3Pos::Switch3Pos(char* msg, char pinA, char pinB, bool reverse) {
+void Switch3Pos::init_(char* msg, char pinA, char pinB, bool reverse) {
 	msg_ = msg;
 	pinA_ = pinA;
 	pinB_ = pinB;
