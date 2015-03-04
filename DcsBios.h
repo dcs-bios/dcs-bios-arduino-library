@@ -168,11 +168,15 @@ class ServoOutput : ExportStreamListener {
 		Servo servo_;
 		unsigned int address_;
 		char pin_;
+		unsigned int inputMin_;
+		unsigned int inputMax_;
 		int minPulseWidth_;
 		int maxPulseWidth_;
+		void init_(unsigned int address, char pin, unsigned int inputMin, unsigned int inputMax, int minPulseWidth, int maxPulseWidth);
 	public:
-		ServoOutput(unsigned int address, char pin, int minPulseWidth, int maxPulseWidth);
-		ServoOutput(unsigned int address, char pin) { ServoOutput(address, pin, 544, 2400); }
+		ServoOutput(unsigned int address, char pin) { init_(address, pin, 0, 65535, 544, 2400); }
+		ServoOutput(unsigned int address, char pin, int minPulseWidth, int maxPulseWidth) { init_(address, pin, 0, 65535, minPulseWidth, maxPulseWidth); }
+		ServoOutput(unsigned int address, char pin, unsigned int inputMin, unsigned int inputMax, int minPulseWidth, int maxPulseWidth) { init_(address, pin, inputMin, inputMax, minPulseWidth, maxPulseWidth); }
 };
 
 template < unsigned int LENGTH >

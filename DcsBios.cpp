@@ -258,9 +258,11 @@ void LED::onDcsBiosWrite(unsigned int address, unsigned int value) {
 	}
 }
 
-ServoOutput::ServoOutput(unsigned int address, char pin, int minPulseWidth, int maxPulseWidth) {
+void ServoOutput::init_(unsigned int address, char pin, unsigned int inputMin, unsigned int inputMax, int minPulseWidth, int maxPulseWidth) {
 	address_ = address;
 	pin_ = pin;
+	inputMin_ = inputMin;
+	inputMax_ = inputMax;
 	minPulseWidth_ = minPulseWidth;
 	maxPulseWidth_ = maxPulseWidth;
 }
@@ -268,7 +270,7 @@ void ServoOutput::onDcsBiosWrite(unsigned int address, unsigned int value) {
 	if (address_ == address) {
 		if (!servo_.attached())
 			servo_.attach(pin_, minPulseWidth_, maxPulseWidth_);
-		servo_.writeMicroseconds(map(value, 0, 65535, minPulseWidth_, maxPulseWidth_));
+		servo_.writeMicroseconds(map(value, inputMin_, inputMax_, minPulseWidth_, maxPulseWidth_));
 	}
 }
 
