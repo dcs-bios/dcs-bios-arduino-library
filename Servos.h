@@ -6,7 +6,7 @@
 #include <Servo.h>
 
 namespace DcsBios {
-	class ServoOutput : IntegerBuffer {
+	class ServoOutput : IntegerData {
 		private:
 			void onDcsBiosFrameSync();
 			Servo servo_;

@@ -3,7 +3,7 @@
 
 namespace DcsBios {
 
-	LED::LED(unsigned int address, unsigned int mask, char pin) : IntegerBuffer(address, mask, 0) {
+	LED::LED(unsigned int address, unsigned int mask, char pin) : IntegerData(address, mask, 0) {
 		pin_ = pin;
 		pinMode(pin_, OUTPUT);
 		digitalWrite(pin_, LOW);
