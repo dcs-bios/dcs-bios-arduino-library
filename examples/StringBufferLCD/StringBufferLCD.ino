@@ -16,7 +16,7 @@ DcsBios::StringBuffer<4> raltDisplayBuffer(0x14aa);
 DcsBios::ProtocolParser parser;
 
 void setup() {
-  Serial.begin(500000);
+  Serial.begin(250000);
   
   // Set up the LCD
   lcd.clear();
