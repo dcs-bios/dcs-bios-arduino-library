@@ -13,8 +13,9 @@ namespace DcsBios {
 			char pin_;
 			unsigned int lastState_;
 			unsigned int deadBand_;
+			bool	invert_;
 		public:
-			Potentiometer(char* msg, char pin, unsigned int deadband=0);
+			Potentiometer(char* msg, char pin, unsigned int deadband=0, bool invert=false);
 	};
 
 }
