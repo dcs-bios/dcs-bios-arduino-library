@@ -6,7 +6,7 @@
 
 namespace DcsBios {
 
-	class LED : IntegerBuffer {
+	class LED : IntegerData {
 		private:
 			void onDcsBiosFrameSync();
 			unsigned char pin_;

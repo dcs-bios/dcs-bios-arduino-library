@@ -43,7 +43,8 @@ namespace DcsBios {
 						buffer[index] = ((char*)&value)[1];
 					}
 					// No need to compare existing buffer with current value.  We never get to this
-					// point unless the sim has sent a change.
+					// point unless the sim has sent a change.				
+					// OH: Is this true - I understood AcftName is always transmitted at the start of the frame?
 					dirty_ = true;
 				}
 			}
@@ -70,11 +71,15 @@ namespace DcsBios {
 			}
 	};
 
-	class IntegerBuffer : ExportStreamListener {
-		private:
+	class IntegerData : ExportStreamListener {
+		protected:
 			void onDcsBiosWrite(unsigned int address, unsigned int value) {
 				if (address == address_) {
-					data = (value & mask_) >> shift_;
+					unsigned int newValue = (value & mask_) >> shift_;
+					if( newValue != data ) {
+						data = newValue;
+						dirty_ = true;
+					}
 				}
 			}
 			unsigned int address_;
@@ -83,7 +88,7 @@ namespace DcsBios {
 			bool dirty_;
 		public:
 			int data;
-			IntegerBuffer(unsigned int address, unsigned int mask, unsigned char shift) {
+			IntegerData(unsigned int address, unsigned int mask, unsigned char shift) {
 				dirty_ = false;
 				address_ = address;
 				mask_ = mask;
@@ -97,6 +102,31 @@ namespace DcsBios {
 			}
 	};
 	
+	class MappedIntegerData : public IntegerData {
+		private:
+			void onDcsBiosWrite(unsigned int address, unsigned int value) {
+				if (address == address_) {
+					unsigned int newValue = map(( value & mask_ ) >> shift_, fromLo_, fromHi_, toLo_, toHi_);
+					if(newValue != data) {
+						data = newValue;
+						dirty_ = true;
+					}
+				}
+			}
+			unsigned int fromLo_;
+			unsigned int fromHi_;
+			unsigned int toLo_;
+			unsigned int toHi_;
+		public:
+			MappedIntegerData(unsigned int address, unsigned int mask, unsigned char shift, unsigned int fromLo=0, unsigned fromHi=65535, unsigned int toLo=0, unsigned int toHi=65535) :
+				IntegerData(address, mask, shift) {
+				fromLo_ = fromLo;
+				fromHi_ = fromHi;
+				toLo_ = toLo;
+				toHi_ = toHi;
+			}
+	};
+
 }
 
 #endif
