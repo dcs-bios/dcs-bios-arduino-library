@@ -11,13 +11,6 @@
 #include "PollingInput.h"
 #include "Protocol.h"
 
-#include "Buttons.h"
-#include "Switches.h"
-#include "Encoders.h"
-#include "Potentiometers.h"
-#include "Leds.h"
-#include "Servos.h"
-
 /*
 The following is an ugly hack to work with the Arduino IDE's build system.
 The DCS-BIOS Arduino Library is configured with #defines such as DCSBIOS_RS485_MASTER or DCSBIOS_RS485_SLAVE <address>.
@@ -94,5 +87,13 @@ do not come with their own build system, we are just putting everything into the
 		Serial.write(msg); Serial.write(' '); Serial.write(arg); Serial.write('\n');
 	}
 #endif
+
+
+#include "Buttons.h"
+#include "Switches.h"
+#include "Encoders.h"
+#include "Potentiometers.h"
+#include "Leds.h"
+#include "Servos.h"
 
 #endif
