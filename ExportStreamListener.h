@@ -59,10 +59,10 @@ namespace DcsBios {
 			
 			}
 			virtual void onDcsBiosWrite(unsigned int address, unsigned int data) {
-
-				this->data = data;
-				this->dirty = true;
-			
+				if (this->data != data) {
+					this->data = data;
+					this->dirty = true;
+				}
 			}
 			bool hasUpdatedData() { return dirty; }
 			unsigned int getData() {
@@ -75,6 +75,30 @@ namespace DcsBios {
 				return ret;
 			}
 	};
+	
+	class IntegerBuffer : Int16Buffer {
+		private:
+			unsigned int mask;
+			unsigned char shift;
+			void (*callback)(unsigned int);
+		public:
+			IntegerBuffer(unsigned int address, unsigned int mask, unsigned char shift, void (*callback)(unsigned int)) : Int16Buffer(address) {
+				this->mask = mask;
+				this->shift = shift;
+				this->callback = callback;
+			}
+			unsigned int getData() {
+				return ((this->Int16Buffer::getData()) & mask) >> shift;
+			}
+			virtual void loop() {
+				if (hasUpdatedData()) {
+					if (callback) {
+						callback(getData());
+					}
+				}
+			}
+	};
+	
 	
 	template < unsigned int LENGTH >
 	class StringBuffer : public ExportStreamListener {
@@ -133,75 +157,7 @@ namespace DcsBios {
 				}
 			}
 	};
-	
-	/*
-	template < unsigned int LENGTH >
-	class StringBuffer : ExportStreamListener {
-		private:
-			void onDcsBiosWrite(unsigned int address, unsigned int value) {
-				if ((address >= address_) && (endAddress_ > address)) {
-					unsigned int index = address - address_;
-					buffer[index] = ((char*)&value)[0];
-					index++;
-					if (LENGTH > index) {
-						buffer[index] = ((char*)&value)[1];
-					}
-					// No need to compare existing buffer with current value.  We never get to this
-					// point unless the sim has sent a change.
-					dirty_ = true;
-				}
-			}
-			unsigned int address_;
-			unsigned int endAddress_;
-			bool dirty_;
-		public:
-			char buffer[LENGTH+1];
-			StringBuffer(unsigned int address) {
-				dirty_ = false;
-				address_ = address;
-				// Move calculating end address into startup.  Timing for
-				// parsing loop is more critical than the extra 2 bytes of ram.
-				endAddress_ = address+LENGTH;
-				memset(buffer, '\0', LENGTH+1);
-			}
-			// Replace callback with external dirty flag.  Callbacks are
-			// not safe inside protcol parsing due to timing criticallity.
-			bool isDirty() {
-				return dirty_;
-			}
-			void clearDirty() {
-				dirty_ = false;
-			}
-	};
-	*/
-/*
-	class IntegerBuffer : ExportStreamListener {
-		private:
-			void onDcsBiosWrite(unsigned int address, unsigned int value) {
-				if (address == address_) {
-					data = (value & mask_) >> shift_;
-				}
-			}
-			unsigned int address_;
-			unsigned int mask_;
-			unsigned char shift_;
-			bool dirty_;
-		public:
-			int data;
-			IntegerBuffer(unsigned int address, unsigned int mask, unsigned char shift) {
-				dirty_ = false;
-				address_ = address;
-				mask_ = mask;
-				shift_ = shift;
-			}
-			bool isDirty() {
-				return dirty_;
-			}
-			void clearDirty() {
-				dirty_ = false;
-			}
-	};
-	*/
+
 }
 
 #endif
