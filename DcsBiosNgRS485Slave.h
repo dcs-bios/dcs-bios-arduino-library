@@ -86,7 +86,7 @@ namespace DcsBios {
 		inline void set_udrie() { *ucsrb |= (1<<UDRIE0); }
 		inline void clear_udrie() { *ucsrb &= ~(1<<UDRIE0); }
 		
-		RS485Slave(volatile uint8_t *udr, volatile uint8_t *ucsra, volatile uint8_t *ucsrb, volatile uint8_t *ucsrc, volatile uint8_t *txen_port, uint8_t txen_pin_mask);
+		RS485Slave(volatile uint8_t *udr, volatile uint8_t *ucsra, volatile uint8_t *ucsrb, volatile uint8_t *ucsrc, uint8_t txen_pin);
 	};
 	
 

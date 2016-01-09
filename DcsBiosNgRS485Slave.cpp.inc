@@ -9,10 +9,12 @@
 
 namespace DcsBios {
 
-	RS485Slave rs485slave(&UDR0, &UCSR0A, &UCSR0B, &UCSR0C, &PORTD, (1<<2));
+	RS485Slave rs485slave(&UDR0, &UCSR0A, &UCSR0B, &UCSR0C, TXENABLE_PIN);
 
-	RS485Slave::RS485Slave(volatile uint8_t *udr, volatile uint8_t *ucsra, volatile uint8_t *ucsrb, volatile uint8_t *ucsrc, volatile uint8_t *txen_port, uint8_t txen_pin_mask) :
-	udr(udr), ucsra(ucsra), ucsrb(ucsrb), ucsrc(ucsrc), txen_port(txen_port), txen_pin_mask(txen_pin_mask) {
+	RS485Slave::RS485Slave(volatile uint8_t *udr, volatile uint8_t *ucsra, volatile uint8_t *ucsrb, volatile uint8_t *ucsrc, uint8_t txen_pin) :
+	udr(udr), ucsra(ucsra), ucsrb(ucsrb), ucsrc(ucsrc) {
+		txen_port = portOutputRegister(digitalPinToPort(txen_pin));
+		txen_pin_mask = digitalPinToBitMask(txen_pin);
 		state = UNINITIALIZED;
 	}
 	
@@ -195,7 +197,7 @@ namespace DcsBios {
 		UBRR0L = 3; // 250000 bps
 		UCSR0A = 0;
 		UCSR0C = (1<<UCSZ00) | (1<<UCSZ01);
-		DDRD |= (1<<2);
+		pinMode(TXENABLE_PIN, OUTPUT);
 		//UCSR0B = (1<<RXEN0) | (1<<TXEN0) | (1<<RXCIE0) | (1<<TXCIE0);
 		rs485slave.clear_txen();
 		

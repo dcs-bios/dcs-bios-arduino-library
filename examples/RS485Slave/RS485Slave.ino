@@ -5,6 +5,12 @@
 */
 #define DCSBIOS_RS485_SLAVE 1
 
+/*
+  The Arduino pin that is connected to the
+  /RE and DE pins on the RS-485 transceiver.
+*/
+#define TXENABLE_PIN 2
+
 #include "DcsBios.h"
 
 DcsBios::Switch2Pos lampTestBtn("LAMP_TEST_BTN", 10);
@@ -17,4 +23,3 @@ void setup() {
 void loop() {
   DcsBios::loop();
 }
-
