@@ -8,11 +8,11 @@ namespace DcsBios {
 	
 	class Switch2Pos : PollingInput {
 		private:
-			char* msg_;
+			const char* msg_;
 			char pin_;
 			char lastState_;
 			bool reverse_;
-			void init_(char* msg, char pin, bool reverse) {
+			void init_(const char* msg, char pin, bool reverse) {
 				msg_ = msg;
 				pin_ = pin;
 				pinMode(pin_, INPUT_PULLUP);
@@ -29,8 +29,8 @@ namespace DcsBios {
 				}
 			}
 		public:
-			Switch2Pos(char* msg, char pin, bool reverse) { init_(msg, pin, reverse); }
-			Switch2Pos(char* msg, char pin) { init_(msg, pin, false); }
+			Switch2Pos(const char* msg, char pin, bool reverse) { init_(msg, pin, reverse); }
+			Switch2Pos(const char* msg, char pin) { init_(msg, pin, false); }
 	};
 
 	
@@ -38,7 +38,7 @@ namespace DcsBios {
 	
 	class Switch3Pos : PollingInput {
 		private:
-			char* msg_;
+			const char* msg_;
 			char pinA_;
 			char pinB_;
 			char lastState_;
@@ -62,7 +62,7 @@ namespace DcsBios {
 				}
 			}
 		public:
-			Switch3Pos(char* msg, char pinA, char pinB) {
+			Switch3Pos(const char* msg, char pinA, char pinB) {
 				msg_ = msg;
 				pinA_ = pinA;
 				pinB_ = pinB;
@@ -75,7 +75,7 @@ namespace DcsBios {
 	
 	class SwitchMultiPos : PollingInput {
 		private:
-			char* msg_;
+			const char* msg_;
 			const byte* pins_;
 			char numberOfPins_;
 			char lastState_;
@@ -96,7 +96,7 @@ namespace DcsBios {
 				}
 			}
 		public:
-			SwitchMultiPos(char* msg, const byte* pins, char numberOfPins) {
+			SwitchMultiPos(const char* msg, const byte* pins, char numberOfPins) {
 				msg_ = msg;
 				pins_ = pins;
 				numberOfPins_ = numberOfPins;
