@@ -6,12 +6,23 @@
 
 namespace DcsBios {
 
-	class LED : IntegerBuffer {
+	class LED : public Int16Buffer {
 		private:
-			void onDcsBiosFrameSync();
-			unsigned char pin_;
+			unsigned char pin;
+			unsigned int mask;
 		public:
-			LED(unsigned int address, unsigned int mask, char pin);
+			LED(unsigned int address, unsigned int mask, char pin) : Int16Buffer(address), mask(mask), pin(pin) {
+				pinMode(pin, OUTPUT);
+			}
+			virtual void loop() {
+				if (hasUpdatedData()) {
+					if (getData() & mask) {
+						digitalWrite(pin, 1);
+					} else {
+						digitalWrite(pin, 0);
+					}
+				}
+			}
 	};
 
 }

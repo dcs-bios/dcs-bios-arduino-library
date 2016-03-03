@@ -1,21 +1,43 @@
 #include "Protocol.h"
 #include "PollingInput.h"
 #include "ExportStreamListener.h"
+#include "RingBuffer.h"
 
 namespace DcsBios {
-
-	PollingInput* PollingInput::firstPollingInput = NULL;
 	ExportStreamListener* ExportStreamListener::firstExportStreamListener = NULL;
+	PollingInput* PollingInput::firstPollingInput = NULL;
 
 	ProtocolParser::ProtocolParser() {
+		processingData = false;
 		state = DCSBIOS_STATE_WAIT_FOR_SYNC;
 		sync_byte_count = 0;
 	}
 
+	/*
+		to be called from ISR
+		stores the character in a buffer, re-enables interrupts and processes the complete
+		buffer before returning to the main program.
+	*/
+	void ProtocolParser::processCharISR(unsigned char c) {
+		incomingDataBuffer.put(c);
+		if (processingData) return;
+		
+		processingData = true;
+		while (1) {
+			if (incomingDataBuffer.isEmpty()) {
+				processingData = false;
+				return;
+			}
+			unsigned char nextByte = incomingDataBuffer.get();
+			interrupts();
+			processChar(nextByte);
+			noInterrupts();
+		}
+	}
+	
 	void ProtocolParser::processChar(unsigned char c) {
-	  
 	  switch(state) {
-	    case DCSBIOS_STATE_WAIT_FOR_SYNC:
+		case DCSBIOS_STATE_WAIT_FOR_SYNC:
 			/* do nothing */
 			break;
 			
@@ -52,34 +74,46 @@ namespace DcsBios {
 		case DCSBIOS_STATE_DATA_HIGH:
 			data = (c << 8) | data;
 			count--;
-			ExportStreamListener::handleDcsBiosWrite(address, data);
-			if (count == 0) {
-				state = DCSBIOS_STATE_ADDRESS_LOW;
+			
 
-				// Frame sync moved to end of frame.  All time consumeing updates should
-				// be handled in framesync during the down time between frame transmissions.
-				// TODO: We should detect waiting bytes in serial buffer and skip frame sync
-				// if more data is waiting.
-				if (address == 0xfffe) {
-					onDcsBiosFrameSync();
-					ExportStreamListener::handleDcsBiosFrameSync();
-				}
-			} else {
-				address += 2;
-				state = DCSBIOS_STATE_DATA_LOW;
+
+			//ExportStreamListener::handleDcsBiosWrite(address, data);
+			// skip all ESLs that cannot possibly be interested in the current address
+			while(startESL && startESL->getLastAddressOfInterest() < address) {
+				startESL->onConsistentData(); // inform the ExportStreamListener that no more data is following in this update
+				startESL = startESL->nextExportStreamListener;
 			}
+			if (startESL) {
+				ExportStreamListener* el = startESL;
+				// assumption: no overlapping ESL ranges
+				while(el) {
+					if (el->getFirstAddressOfInterest() > address) break;
+					if (el->getFirstAddressOfInterest() <= address && el->getLastAddressOfInterest() >= address) {
+					
+						el->onDcsBiosWrite(address, data);
+					}
+					el = el->nextExportStreamListener;
+				}
+			}
+
+			
+			address += 2;
+			if (count == 0)
+				state = DCSBIOS_STATE_ADDRESS_LOW;
+			else
+				state = DCSBIOS_STATE_DATA_LOW;
 			break;
 	  }
 
-	  if (c == 0x55) {
+	  if (c == 0x55)
 		sync_byte_count++;
-	  } else {
+	  else
 		sync_byte_count = 0;
-	  }
 	  
 	  if (sync_byte_count == 4) {
 		state = DCSBIOS_STATE_ADDRESS_LOW;
-		sync_byte_count = 0;		
+		sync_byte_count = 0;
+		startESL = ExportStreamListener::firstExportStreamListener;
 	  }
 	  
 	}

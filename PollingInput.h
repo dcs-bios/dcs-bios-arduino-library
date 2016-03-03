@@ -3,7 +3,7 @@
 
 #include "Arduino.h"
 
-void sendDcsBiosMessage(const char* msg, const char* args);
+bool sendDcsBiosMessage(const char* msg, const char* args);
 
 namespace DcsBios {
 
@@ -25,7 +25,7 @@ namespace DcsBios {
 				}
 			}
 	};
-
+	
 }
 
 #endif
