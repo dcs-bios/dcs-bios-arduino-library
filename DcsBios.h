@@ -28,16 +28,22 @@ do not come with their own build system, we are just putting everything into the
 	#include "DcsBiosNgRS485Slave.cpp.inc"
 #endif
 #ifdef DCSBIOS_IRQ_SERIAL
+
+	#ifndef USART0_RX_vect
+	#define USART0_RX_vect USART_RX_vect
+	#define PRR0 PRR
+	#endif
+
 	namespace DcsBios {
 		ProtocolParser parser;
 		
-		ISR(USART_RX_vect) {
+		ISR(USART0_RX_vect) {
 			volatile uint8_t c = UDR0;
 			parser.processCharISR(c);
 		}
 		
 		void setup() {
-			PRR &= ~(1<<PRUSART0);
+			PRR0 &= ~(1<<PRUSART0);
 			UBRR0H = 0;
 			UBRR0L = 3; // 250000 bps
 			UCSR0A = 0;
