@@ -11,8 +11,7 @@
 
 #include "DcsBios.h"
 
-DcsBios::Switch2Pos lampTestBtn("LAMP_TEST_BTN", 10);
-DcsBios::LED nmspIlsLed(0x1112, 0x0020, 13);
+/* paste code snippets from the reference documentation here */
 
 void setup() {
   DcsBios::setup();
