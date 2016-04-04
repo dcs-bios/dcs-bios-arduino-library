@@ -9,8 +9,6 @@
 
 namespace DcsBios {
 
-	RS485Slave rs485slave(&UDR0, &UCSR0A, &UCSR0B, &UCSR0C, TXENABLE_PIN);
-
 	RS485Slave::RS485Slave(volatile uint8_t *udr, volatile uint8_t *ucsra, volatile uint8_t *ucsrb, volatile uint8_t *ucsrc, uint8_t txen_pin) :
 	udr(udr), ucsra(ucsra), ucsrb(ucsrb), ucsrc(ucsrc) {
 		txen_port = portOutputRegister(digitalPinToPort(txen_pin));
@@ -184,15 +182,16 @@ namespace DcsBios {
 	}
 
 	
-	ISR(USART_RX_vect) { rs485slave.rxISR(); }
-	ISR(USART_TX_vect) { rs485slave.txcISR(); }
-	ISR(USART_UDRE_vect) { rs485slave.udreISR(); }
+	RS485Slave rs485slave(&UDR0, &UCSR0A, &UCSR0B, &UCSR0C, TXENABLE_PIN);	
+	ISR(USART0_RX_vect) { rs485slave.rxISR(); }
+	ISR(USART0_TX_vect) { rs485slave.txcISR(); }
+	ISR(USART0_UDRE_vect) { rs485slave.udreISR(); }
 	
 	void setup() {
 		DDRC |= (1<<4) | (1<<5);
 		PORTC |= (1<<4) | (1<<5);
 	
-		PRR &= ~(1<<PRUSART0);
+		PRR0 &= ~(1<<PRUSART0);
 		UBRR0H = 0;
 		UBRR0L = 3; // 250000 bps
 		UCSR0A = 0;

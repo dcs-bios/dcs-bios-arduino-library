@@ -11,6 +11,11 @@
 #include "PollingInput.h"
 #include "Protocol.h"
 
+#ifndef USART0_RX_vect
+#define USART0_RX_vect USART_RX_vect
+#define PRR0 PRR
+#endif
+
 /*
 The following is an ugly hack to work with the Arduino IDE's build system.
 The DCS-BIOS Arduino Library is configured with #defines such as DCSBIOS_RS485_MASTER or DCSBIOS_RS485_SLAVE <address>.
@@ -28,11 +33,6 @@ do not come with their own build system, we are just putting everything into the
 	#include "DcsBiosNgRS485Slave.cpp.inc"
 #endif
 #ifdef DCSBIOS_IRQ_SERIAL
-
-	#ifndef USART0_RX_vect
-	#define USART0_RX_vect USART_RX_vect
-	#define PRR0 PRR
-	#endif
 
 	namespace DcsBios {
 		ProtocolParser parser;
