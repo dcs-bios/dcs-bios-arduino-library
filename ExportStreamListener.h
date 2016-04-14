@@ -53,23 +53,34 @@ namespace DcsBios {
 	class Int16Buffer : public ExportStreamListener {
 		private:
 			volatile unsigned int data;
-			volatile bool dirty;
+			volatile unsigned char flags;
+			enum FLAGS {
+				DIRTY = (1<<0),
+				RECEIVED_DATA_BEFORE = (1<<2)
+			};
 		public:
-			Int16Buffer(unsigned int address) : ExportStreamListener(address, address) {
+			Int16Buffer(unsigned int address) : ExportStreamListener(address, address), flags(0) {
 			
 			}
 			virtual void onDcsBiosWrite(unsigned int address, unsigned int data) {
-				if (this->data != data) {
+				if (this->flags == 0) {
+					// first update ever
 					this->data = data;
-					this->dirty = true;
+					this->flags = DIRTY | RECEIVED_DATA_BEFORE;
+				} else {
+					// regular update, only accept if data has changed
+					if (this->data != data) {
+						this->data = data;
+						this->flags = DIRTY | RECEIVED_DATA_BEFORE;
+					}
 				}
 			}
-			bool hasUpdatedData() { return dirty; }
+			bool hasUpdatedData() { return (this->flags & DIRTY); }
 			unsigned int getData() {
 				uint16_t ret;
 				noInterrupts();
 				ret = data;
-				dirty = false;
+				flags &= ~(DIRTY); // clear dirty bit
 				interrupts();
 				
 				return ret;
