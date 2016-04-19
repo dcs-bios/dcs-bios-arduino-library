@@ -17,8 +17,8 @@ namespace DcsBios {
 			
 			static ExportStreamListener* firstExportStreamListener;
 			ExportStreamListener(uint16_t firstAddressOfInterest, uint16_t lastAddressOfInterest) {
-				this->firstAddressOfInterest = firstAddressOfInterest;
-				this->lastAddressOfInterest = lastAddressOfInterest;
+				this->firstAddressOfInterest = firstAddressOfInterest & ~(0x01);
+				this->lastAddressOfInterest = lastAddressOfInterest & ~(0x01);
 				
 				// nothing in the list? insert self as first element.
 				if (firstExportStreamListener == NULL) {
@@ -28,11 +28,12 @@ namespace DcsBios {
 				}
 				
 				// insert into list of export stream listeners,
-				// keep list ordered ascending by lastAddressOfInterest
+				// keep list ordered ascending by lastAddressOfInterest, then ascending firstAddressOfInterest
 				ExportStreamListener** prevNextPtr = &firstExportStreamListener;
 				ExportStreamListener* nextESL = firstExportStreamListener;
 				
-				while (nextESL && nextESL->getLastAddressOfInterest() < lastAddressOfInterest) {
+				while (nextESL && ((nextESL->getLastAddressOfInterest() < this->lastAddressOfInterest) ||
+								   (nextESL->getLastAddressOfInterest() == this->lastAddressOfInterest && nextESL->getFirstAddressOfInterest() < this->firstAddressOfInterest))) {
 					prevNextPtr = &(nextESL->nextExportStreamListener);
 					nextESL = nextESL->nextExportStreamListener;
 				}
