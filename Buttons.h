@@ -14,9 +14,9 @@ namespace DcsBios {
 				char state = digitalRead(pin_);
 				if (state != lastState_) {
 					if (lastState_ == HIGH && state == LOW) {
-						if (sendDcsBiosMessage(msg_, arg_))
-							lastState_ = state;
+						while(!sendDcsBiosMessage(msg_, arg_));
 					}
+					lastState_ = state;
 				}
 			}
 		public:
