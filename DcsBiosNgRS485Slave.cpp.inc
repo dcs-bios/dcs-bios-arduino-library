@@ -1,11 +1,6 @@
 #ifdef DCSBIOS_RS485_SLAVE
 
-#ifndef cbi
-#define cbi(sfr, bit) (_SFR_BYTE(sfr) &= ~_BV(bit))
-#endif
-#ifndef sbi
-#define sbi(sfr, bit) (_SFR_BYTE(sfr) |= _BV(bit))
-#endif
+
 
 namespace DcsBios {
 
@@ -80,7 +75,6 @@ namespace DcsBios {
 			// no break statement here, we want it to fall through to the next case!
 			
 			case RX_WAIT_ADDRESS:
-				cbi(PORTC,4);
 				rx_slave_address = c;
 				state = RX_WAIT_MSGTYPE;
 			break;
@@ -91,7 +85,6 @@ namespace DcsBios {
 			break;
 			
 			case RX_WAIT_DATALENGTH:
-				sbi(PORTC,4);
 				rxtx_len = c;
 				
 				if (rxtx_len == 0) {
@@ -188,9 +181,6 @@ namespace DcsBios {
 	ISR(USART0_UDRE_vect) { rs485slave.udreISR(); }
 	
 	void setup() {
-		DDRC |= (1<<4) | (1<<5);
-		PORTC |= (1<<4) | (1<<5);
-	
 		PRR0 &= ~(1<<PRUSART0);
 		UBRR0H = 0;
 		UBRR0L = 3; // 250000 bps
