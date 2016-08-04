@@ -84,7 +84,7 @@ namespace DcsBios {
 				for (i=0; i<numberOfPins_; i++) {
 					if (digitalRead(pins_[i]) == LOW) return i;
 				}
-				return 0;
+				return lastState_;
 			}
 			void pollInput() {
 				char state = readState();
@@ -96,7 +96,7 @@ namespace DcsBios {
 				}
 			}
 		public:
-			SwitchMultiPos(const char* msg, const byte* pins, char numberOfPins) {
+			SwitchMultiPos(const char* msg, const byte* pins, char numberOfPins) : lastState_(0) {
 				msg_ = msg;
 				pins_ = pins;
 				numberOfPins_ = numberOfPins;
