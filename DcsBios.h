@@ -93,6 +93,7 @@ do not come with their own build system, we are just putting everything into the
 	}
 	bool sendDcsBiosMessage(const char* msg, const char* arg) {
 		Serial.write(msg); Serial.write(' '); Serial.write(arg); Serial.write('\n');
+		return true;
 	}
 #endif
 
