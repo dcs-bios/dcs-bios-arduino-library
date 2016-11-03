@@ -88,7 +88,7 @@ namespace DcsBios {
 			}
 	};
 	
-	class IntegerBuffer : Int16Buffer {
+	class IntegerBuffer : public Int16Buffer {
 		private:
 			unsigned int mask;
 			unsigned char shift;
