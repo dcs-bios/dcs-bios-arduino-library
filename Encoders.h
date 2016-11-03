@@ -5,6 +5,11 @@
 #include "PollingInput.h"
 
 namespace DcsBios {
+	enum StepsPerDetent {
+		ONE_STEP_PER_DETENT = 1,
+		TWO_STEPS_PER_DETENT = 2,
+		FOUR_STEPS_PER_DETENT = 4
+	};
 	class RotaryEncoder : PollingInput {
 		private:
 			const char* msg_;
@@ -14,6 +19,7 @@ namespace DcsBios {
 			char pinB_;
 			char lastState_;
 			signed char delta_;
+			char stepsPerDetent_;
 			char readState() {
 				return (digitalRead(pinA_) << 1) | digitalRead(pinB_);
 			}
@@ -39,22 +45,23 @@ namespace DcsBios {
 				}
 				lastState_ = state;
 				
-				if (delta_ >= 4) {
+				if (delta_ >= stepsPerDetent_) {
 					if (sendDcsBiosMessage(msg_, incArg_))
-						delta_ -= 4;
+						delta_ -= stepsPerDetent_;
 				}
-				if (delta_ <= -4) {
+				if (delta_ <= -stepsPerDetent_) {
 					if (sendDcsBiosMessage(msg_, decArg_))
-						delta_ += 4;
+						delta_ += stepsPerDetent_;
 				}
 			}
 		public:
-			RotaryEncoder(const char* msg, const char* decArg, const char* incArg, char pinA, char pinB) {
+			RotaryEncoder(const char* msg, const char* decArg, const char* incArg, char pinA, char pinB, StepsPerDetent stepsPerDetent = FOUR_STEPS_PER_DETENT) {
 				msg_ = msg;
 				decArg_ = decArg;
 				incArg_ = incArg;
 				pinA_ = pinA;
 				pinB_ = pinB;
+				stepsPerDetent_ = stepsPerDetent;
 				pinMode(pinA_, INPUT_PULLUP);
 				pinMode(pinB_, INPUT_PULLUP);
 				delta_ = 0;
