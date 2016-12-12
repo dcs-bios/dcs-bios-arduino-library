@@ -111,7 +111,7 @@
 		
 	}
 	
-	void __attribute__((always_inline)) RS485Master::udreISR() {
+	void __attribute__((always_inline)) inline RS485Master::udreISR() {
 		
 		// called when we can load the next byte to be sent into UDR
 		switch(state) {
@@ -152,7 +152,7 @@
 		}
 	}
 	
-	void __attribute__((always_inline)) RS485Master::txcISR() {
+	void __attribute__((always_inline)) inline RS485Master::txcISR() {
 		//clear_txen();
 		switch (state) {
 			
@@ -174,7 +174,7 @@
 		}
 	}
 	
-	void __attribute__((always_inline)) RS485Master::rxISR() {
+	void __attribute__((always_inline)) inline RS485Master::rxISR() {
 		volatile uint8_t data = *udr;
 		switch(state) {
 			case RX_WAIT_DATALENGTH:
@@ -230,7 +230,7 @@
 	: udr(udr), ucsra(ucsra), ucsrb(ucsrb), ucsrc(ucsrc) {
 	}
 	
-	void __attribute__((always_inline)) MasterPCConnection::advanceTxBuffer() {
+	void __attribute__((always_inline)) inline MasterPCConnection::advanceTxBuffer() {
 		RS485Master* start = next_tx_rs485_master;
 		while(1) {
 			next_tx_rs485_master = next_tx_rs485_master->nextRS485Master;
@@ -258,7 +258,7 @@
 		}
 	}
 	
-	void __attribute__((always_inline)) MasterPCConnection::udreISR() {
+	void __attribute__((always_inline)) inline MasterPCConnection::udreISR() {
 		if (pc_tx_buffer == NULL) advanceTxBuffer();
 		
 		// if the buffer is empty, we have nothing to do but wait for more data
@@ -282,7 +282,7 @@
 		*udr = pc_tx_buffer->get();
 	}
 	
-	void __attribute__((always_inline)) MasterPCConnection::rxISR() {
+	void __attribute__((always_inline)) inline MasterPCConnection::rxISR() {
 		volatile uint8_t c = *udr;
 		#ifdef UART1_TXENABLE_PIN
 		uart1.exportData.put(c);
