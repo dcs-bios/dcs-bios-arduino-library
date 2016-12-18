@@ -105,4 +105,19 @@ do not come with their own build system, we are just putting everything into the
 #include "Leds.h"
 #include "Servos.h"
 
+namespace DcsBios {
+	template<unsigned int first, unsigned int second>
+	unsigned int piecewiseMap(unsigned int newValue) {
+		return 0;
+	}
+
+	template<unsigned int from1, unsigned int to1, unsigned int from2, unsigned int to2, unsigned int... rest>
+	unsigned int piecewiseMap(unsigned int newValue) {
+		if (newValue < from2) {
+			return map(newValue, from1, from2, to1, to2);
+		} else {
+			return piecewiseMap<from2, to2, rest...>(newValue);
+		}
+	}
+}
 #endif
