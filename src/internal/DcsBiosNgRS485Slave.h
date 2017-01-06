@@ -27,6 +27,7 @@ namespace DcsBios {
 		messageBuffer.put('\n');
 		
 		messageBuffer.complete = true;
+		DcsBios::PollingInput::setMessageSentOrQueued();
 		return true;
 	}
 	

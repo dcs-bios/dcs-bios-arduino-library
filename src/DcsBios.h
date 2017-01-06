@@ -74,6 +74,7 @@ do not come with their own build system, we are just putting everything into the
 		DcsBios::usart_tx(" ");
 		DcsBios::usart_tx(arg);
 		DcsBios::usart_tx("\n");
+		DcsBios::PollingInput::setMessageSentOrQueued();
 		return true;
 	}
 #endif
@@ -93,6 +94,7 @@ do not come with their own build system, we are just putting everything into the
 	}
 	bool sendDcsBiosMessage(const char* msg, const char* arg) {
 		Serial.write(msg); Serial.write(' '); Serial.write(arg); Serial.write('\n');
+		DcsBios::PollingInput::setMessageSentOrQueued();
 		return true;
 	}
 #endif
