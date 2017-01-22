@@ -17,11 +17,11 @@ namespace DcsBios {
 						lastState_ = state;
 				}
 			}
-			char* msg_;
+			const char* msg_;
 			char pin_;
 			unsigned int lastState_;
 		public:
-			Potentiometer(char* msg, char pin) {
+			Potentiometer(const char* msg, char pin) {
 				msg_ = msg;
 				pin_ = pin;
 				pinMode(pin_, INPUT);

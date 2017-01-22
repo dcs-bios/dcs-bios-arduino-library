@@ -6,8 +6,8 @@
 namespace DcsBios {
 	class ActionButton : PollingInput {
 		private:
-			char* msg_;
-			char* arg_;
+			const char* msg_;
+			const char* arg_;
 			char pin_;
 			char lastState_;
 			void pollInput() {
@@ -20,7 +20,7 @@ namespace DcsBios {
 				}
 			}
 		public:
-			ActionButton(char* msg, char* arg, char pin) {
+			ActionButton(const char* msg, const char* arg, char pin) {
 				msg_ = msg;
 				arg_ = arg;
 				pin_ = pin;
