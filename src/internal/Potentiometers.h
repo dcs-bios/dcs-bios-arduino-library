@@ -19,10 +19,10 @@ namespace DcsBios {
 				accumulator += ((float)state - accumulator) / (float)ewma_divisor;
 				state = (unsigned int)accumulator;
 				
-				if ((lastState_ > state && (lastState_ - state > hysteresis))
-				|| (state > lastState_) && (state - lastState_ > hysteresis)
-				|| (state > (65535 - hysteresis) && state > lastState_)
-				|| (state < hysteresis && state < lastState_)
+				if (((lastState_ > state && (lastState_ - state > hysteresis)))
+				|| ((state > lastState_) && (state - lastState_ > hysteresis))
+				|| ((state > (65535 - hysteresis) && state > lastState_))
+				|| ((state < hysteresis && state < lastState_))
 				) {
 					char buf[6];
 					utoa(state, buf, 10);

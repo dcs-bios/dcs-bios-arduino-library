@@ -80,7 +80,7 @@ namespace DcsBios {
 			char numberOfPins_;
 			char lastState_;
 			char readState() {
-				char i;
+				unsigned char i;
 				for (i=0; i<numberOfPins_; i++) {
 					if (digitalRead(pins_[i]) == LOW) return i;
 				}
@@ -100,7 +100,7 @@ namespace DcsBios {
 				msg_ = msg;
 				pins_ = pins;
 				numberOfPins_ = numberOfPins;
-				char i;
+				unsigned char i;
 				for (i=0; i<numberOfPins; i++) {
 					pinMode(pins[i], INPUT_PULLUP);
 				}

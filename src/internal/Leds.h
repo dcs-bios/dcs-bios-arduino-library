@@ -8,8 +8,8 @@ namespace DcsBios {
 
 	class LED : public Int16Buffer {
 		private:
-			unsigned char pin;
 			unsigned int mask;
+			unsigned char pin;
 		public:
 			LED(unsigned int address, unsigned int mask, char pin) : Int16Buffer(address), mask(mask), pin(pin) {
 				pinMode(pin, OUTPUT);
