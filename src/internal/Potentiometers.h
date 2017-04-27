@@ -26,7 +26,7 @@ namespace DcsBios {
 				) {
 					char buf[6];
 					utoa(state, buf, 10);
-					if (sendDcsBiosMessage(msg_, buf))
+					if (tryToSendDcsBiosMessage(msg_, buf))
 						lastState_ = state;
 				}
 			}

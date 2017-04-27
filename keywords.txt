@@ -1,3 +1,1 @@
 DcsBios	KEYWORD1
-processChar	KEYWORD2
-sendDcsBiosMessage KEYWORD3

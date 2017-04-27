@@ -68,14 +68,15 @@ do not come with their own build system, we are just putting everything into the
 				UDR0 = *c++; // write byte to TX buffer
 			}
 		}
-	}
-	bool sendDcsBiosMessage(const char* msg, const char* arg) {
-		DcsBios::usart_tx(msg);
-		DcsBios::usart_tx(" ");
-		DcsBios::usart_tx(arg);
-		DcsBios::usart_tx("\n");
-		DcsBios::PollingInput::setMessageSentOrQueued();
-		return true;
+		
+		bool tryToSendDcsBiosMessage(const char* msg, const char* arg) {
+			DcsBios::usart_tx(msg);
+			DcsBios::usart_tx(" ");
+			DcsBios::usart_tx(arg);
+			DcsBios::usart_tx("\n");
+			DcsBios::PollingInput::setMessageSentOrQueued();
+			return true;
+		}
 	}
 #endif
 #ifdef DCSBIOS_DEFAULT_SERIAL
@@ -92,7 +93,7 @@ do not come with their own build system, we are just putting everything into the
 			ExportStreamListener::loopAll();			
 		}
 	}
-	bool sendDcsBiosMessage(const char* msg, const char* arg) {
+	bool tryToSendDcsBiosMessage(const char* msg, const char* arg) {
 		Serial.write(msg); Serial.write(' '); Serial.write(arg); Serial.write('\n');
 		DcsBios::PollingInput::setMessageSentOrQueued();
 		return true;
@@ -121,5 +122,15 @@ namespace DcsBios {
 			return piecewiseMap<from2, to2, rest...>(newValue);
 		}
 	}
+	
+	inline bool sendDcsBiosMessage(const char* msg, const char* arg) {
+		while(!tryToSendDcsBiosMessage(msg, arg));
+		return true;
+	}
+}
+// for backwards compatibility, can be removed when we have a proper place to document this interface:
+inline bool sendDcsBiosMessage(const char* msg, const char* arg) {
+	while(!DcsBios::tryToSendDcsBiosMessage(msg, arg));
+	return true;
 }
 #endif

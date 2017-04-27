@@ -11,7 +11,7 @@ namespace DcsBios {
 	DcsBios::RingBuffer<32> messageBuffer;
 	
 
-	bool sendDcsBiosMessage(const char* msg, const char* arg) {
+	bool tryToSendDcsBiosMessage(const char* msg, const char* arg) {
 		if (messageBuffer.complete) return false; // buffer occupied
 		
 		messageBuffer.clear();

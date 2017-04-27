@@ -23,7 +23,7 @@ namespace DcsBios {
 				char state = digitalRead(pin_);
 				if (reverse_) state = !state;
 				if (state != lastState_) {
-					if (sendDcsBiosMessage(msg_, state == HIGH ? "0" : "1")) {
+					if (tryToSendDcsBiosMessage(msg_, state == HIGH ? "0" : "1")) {
 						lastState_ = state;
 					}
 				}
@@ -51,13 +51,13 @@ namespace DcsBios {
 				char state = readState();
 				if (state != lastState_) {
 					if (state == 0)
-						if (sendDcsBiosMessage(msg_, "0"))
+						if (tryToSendDcsBiosMessage(msg_, "0"))
 							lastState_ = state;
 					if (state == 1)
-						if (sendDcsBiosMessage(msg_, "1"))
+						if (tryToSendDcsBiosMessage(msg_, "1"))
 							lastState_ = state;
 					if (state == 2)
-						if(sendDcsBiosMessage(msg_, "2"))
+						if(tryToSendDcsBiosMessage(msg_, "2"))
 							lastState_ = state;
 				}
 			}
@@ -91,7 +91,7 @@ namespace DcsBios {
 				if (state != lastState_) {
 					char buf[7];
 					utoa(state, buf, 10);
-					if (sendDcsBiosMessage(msg_, buf))
+					if (tryToSendDcsBiosMessage(msg_, buf))
 						lastState_ = state;
 				}
 			}

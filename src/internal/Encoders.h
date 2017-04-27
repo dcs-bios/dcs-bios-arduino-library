@@ -46,11 +46,11 @@ namespace DcsBios {
 				lastState_ = state;
 				
 				if (delta_ >= stepsPerDetent_) {
-					if (sendDcsBiosMessage(msg_, incArg_))
+					if (tryToSendDcsBiosMessage(msg_, incArg_))
 						delta_ -= stepsPerDetent_;
 				}
 				if (delta_ <= -stepsPerDetent_) {
-					if (sendDcsBiosMessage(msg_, decArg_))
+					if (tryToSendDcsBiosMessage(msg_, decArg_))
 						delta_ += stepsPerDetent_;
 				}
 			}

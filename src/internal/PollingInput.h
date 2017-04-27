@@ -3,7 +3,7 @@
 
 #include "Arduino.h"
 
-bool sendDcsBiosMessage(const char* msg, const char* args);
+bool tryToSendDcsBiosMessage(const char* msg, const char* args);
 
 static bool messageSentOrQueued;
 
