@@ -122,7 +122,10 @@ namespace DcsBios {
 			return piecewiseMap<from2, to2, rest...>(newValue);
 		}
 	}
-	
+}
+
+#ifndef DCSBIOS_RS485_MASTER
+namespace DcsBios {	
 	inline bool sendDcsBiosMessage(const char* msg, const char* arg) {
 		while(!tryToSendDcsBiosMessage(msg, arg));
 		return true;
@@ -134,3 +137,5 @@ inline bool sendDcsBiosMessage(const char* msg, const char* arg) {
 	return true;
 }
 #endif
+
+#endif // include guard
