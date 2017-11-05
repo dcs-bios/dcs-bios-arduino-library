@@ -107,6 +107,8 @@ do not come with their own build system, we are just putting everything into the
 #include "internal/Potentiometers.h"
 #include "internal/Leds.h"
 #include "internal/Servos.h"
+#include "internal/Dimmer.h"
+#include "internal/BcdWheels.h"
 
 namespace DcsBios {
 	template<unsigned int first, unsigned int second>
