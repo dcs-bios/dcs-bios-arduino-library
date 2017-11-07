@@ -72,7 +72,7 @@ void onUhfFrequencyChange(char* newValue) {
   lc.setChar(0,3,tens,false);
   lc.setChar(0,4,hundreds,false);
 }
-DcsBios::StringBuffer<6> uhfFrequencyBuffer(0x612a, onUhfFrequencyChange);
+DcsBios::StringBuffer<6> uhfFrequencyBuffer(0x6126, onUhfFrequencyChange);
 
 void setup() {
   DcsBios::setup();
