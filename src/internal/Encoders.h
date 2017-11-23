@@ -55,7 +55,7 @@ namespace DcsBios {
 				}
 			}
 		public:
-			RotaryEncoder(const char* msg, const char* decArg, const char* incArg, char pinA, char pinB, StepsPerDetent stepsPerDetent = FOUR_STEPS_PER_DETENT) {
+			RotaryEncoder(const char* msg, const char* decArg, const char* incArg, char pinA, char pinB, StepsPerDetent stepsPerDetent = ONE_STEP_PER_DETENT) {
 				msg_ = msg;
 				decArg_ = decArg;
 				incArg_ = incArg;
