@@ -31,7 +31,9 @@ namespace DcsBios {
 			unsigned char nextByte = incomingDataBuffer.get();
 			interrupts();
 			processChar(nextByte);
+#ifdef DCSBIOS_RS485_SLAVE
 			noInterrupts();
+#endif
 		}
 	}
 	
