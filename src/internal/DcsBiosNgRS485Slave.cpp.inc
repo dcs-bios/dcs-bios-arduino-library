@@ -1,11 +1,14 @@
 #ifdef DCSBIOS_RS485_SLAVE
 
-
-
 namespace DcsBios {
-
+#ifdef DCSBIOS_FOR_STM32
+	RS485Slave::RS485Slave(usart_dev *usart, uint32_t txen_pin) :
+	udr(&usart->regs->DR), usart_sr(&usart->regs->SR), usart_cr1(&usart->regs->CR1), usart_cr2(&usart->regs->CR2), usart_cr3(&usart->regs->CR3), usart_brr(&usart->regs->BRR)
+#else
 	RS485Slave::RS485Slave(volatile uint8_t *udr, volatile uint8_t *ucsra, volatile uint8_t *ucsrb, volatile uint8_t *ucsrc, uint8_t txen_pin) :
-	udr(udr), ucsra(ucsra), ucsrb(ucsrb), ucsrc(ucsrc) {
+	udr(udr), ucsra(ucsra), ucsrb(ucsrb), ucsrc(ucsrc)
+#endif
+	{
 		txen_port = portOutputRegister(digitalPinToPort(txen_pin));
 		txen_pin_mask = digitalPinToBitMask(txen_pin);
 		state = UNINITIALIZED;
@@ -173,8 +176,50 @@ namespace DcsBios {
 		}
 		
 	}
-
 	
+	#ifdef DCSBIOS_FOR_STM32
+	void RS485Slave::UsartIRQ()	{
+		if((*usart_sr & (1<<USART_SR_TXE_BIT)) && udrie_set)
+		{
+			udreISR();
+		}
+		if((*usart_sr & (1<<USART_SR_TC_BIT)) && tx_enabled)
+		{
+			txcISR();
+		}
+		if((*usart_sr & ((1<<USART_SR_RXNE_BIT) | (1<<USART_SR_ORE_BIT))) && rx_enabled)
+		{
+			rxISR();
+		}
+	}
+	
+	RS485Slave rs485slave(USART1, TXENABLE_PIN);
+	
+	extern "C" void  __irq_usart1()	{
+		rs485slave.UsartIRQ();
+	}
+	
+	void setup() {
+		RCC_BASE->APB2ENR |= (1<<RCC_APB2ENR_USART1EN_BIT);
+		*rs485slave.usart_cr1 = (1<<USART_CR1_UE_BIT); // Set "USART enable" bit
+		//*rs485slave.usart_brr = 144; //Baud = fck/BRR = 36MHz / 144 = 250000bps
+		//*rs485slave.usart_brr = 192; //Baud = fck/BRR = 48MHz / 144 = 250000bps
+		*rs485slave.usart_brr = 288; //Baud = fck/BRR = 72MHz / 288 = 250000bps
+		//*rs485slave.usart_brr = 336;  //Baud = fck/BRR = 84MHz / 336 = 250000bps
+		pinMode(TXENABLE_PIN, OUTPUT);
+#if 1 // F103
+		gpio_set_mode(GPIOA, 9, GPIO_AF_OUTPUT_PP);
+		gpio_set_mode(GPIOA, 10, GPIO_INPUT_FLOATING);
+#else  // F407
+		gpio_set_mode(PB6, GPIO_AF_OUTPUT_PP);
+		gpio_set_mode(PB7, GPIO_AF_OUTPUT_PP);
+		gpio_set_af_mode(PB6, 7);
+		gpio_set_af_mode(PB7, 7);
+#endif
+		nvic_irq_enable(NVIC_USART1);
+		rs485slave.clear_txen();
+	}
+#else	
 	RS485Slave rs485slave(&UDR0, &UCSR0A, &UCSR0B, &UCSR0C, TXENABLE_PIN);	
 	ISR(USART0_RX_vect) { rs485slave.rxISR(); }
 	ISR(USART0_TX_vect) { rs485slave.txcISR(); }
@@ -188,14 +233,13 @@ namespace DcsBios {
 		UCSR0C = (1<<UCSZ00) | (1<<UCSZ01);
 		pinMode(TXENABLE_PIN, OUTPUT);
 		//UCSR0B = (1<<RXEN0) | (1<<TXEN0) | (1<<RXCIE0) | (1<<TXCIE0);
-		rs485slave.clear_txen();
-		
+		rs485slave.clear_txen();	
 	}
+#endif
 	
 	void loop() {
 		PollingInput::pollInputs();
 		ExportStreamListener::loopAll();
 	}
-
 }
 #endif

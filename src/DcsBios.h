@@ -7,6 +7,10 @@
 
 #include <stdint.h>
 
+#ifdef DCSBIOS_FOR_STM32
+#include <itoa.h>
+#endif
+
 #include "internal/ExportStreamListener.h"
 #include "internal/PollingInput.h"
 #include "internal/Protocol.h"

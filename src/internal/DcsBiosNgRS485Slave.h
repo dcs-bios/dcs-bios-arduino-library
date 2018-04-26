@@ -5,6 +5,10 @@
 #include "Arduino.h"
 #include "RingBuffer.h"
 
+#ifdef DCSBIOS_FOR_STM32
+#include <libmaple/usart.h>
+#endif
+
 namespace DcsBios {
 	
 	ProtocolParser parser;
@@ -34,12 +38,23 @@ namespace DcsBios {
 	
 	class RS485Slave {
 	public:
+#ifdef DCSBIOS_FOR_STM32
+		volatile uint32_t *udr;
+		volatile uint32_t *usart_sr;
+		volatile uint32_t *usart_cr1;
+		volatile uint32_t *usart_cr2;
+		volatile uint32_t *usart_cr3;
+		volatile uint32_t *usart_brr;
+		
+		volatile uint32_t *txen_port;
+#else
 		volatile uint8_t *udr;
 		volatile uint8_t *ucsra;
 		volatile uint8_t *ucsrb;
 		volatile uint8_t *ucsrc;
 		
 		volatile uint8_t *txen_port;
+#endif
 		volatile uint8_t txen_pin_mask;
 		volatile uint8_t rxtx_len;
 		volatile uint8_t checksum;
@@ -79,7 +94,30 @@ namespace DcsBios {
 		void rxISR();
 		void udreISR();
 		void txcISR();
-		
+
+#ifdef DCSBIOS_FOR_STM32
+		volatile bool tx_enabled = false, rx_enabled = true, udrie_set = false;
+		inline void set_txen() {
+			*usart_cr1 &= ~((1<<USART_CR1_RE_BIT) | (1<<USART_CR1_RXNEIE_BIT)); 
+			*txen_port |= txen_pin_mask;
+			*usart_cr1 |= (1<<USART_CR1_TE_BIT) | (1<<USART_CR1_TCIE_BIT);
+			rx_enabled = false;
+			tx_enabled = true;
+		};
+		inline void clear_txen() {
+			*usart_cr1 &= ~((1<<USART_CR1_TE_BIT) | (1<<USART_CR1_TCIE_BIT));
+			*txen_port &= ~txen_pin_mask;
+			*usart_cr1 |= (1<<USART_CR1_RE_BIT) | (1<<USART_CR1_RXNEIE_BIT);
+			rx_enabled = true;
+			tx_enabled = false;
+		};
+		inline void tx_byte(uint8_t c) { set_txen(); volatile uint32_t temp = *usart_sr; *udr = c; } //*usart_sr &= ~(1<<USART_SR_TC_BIT); }
+		inline void tx_delay_byte() { *usart_cr1 |= (1<<USART_CR1_TE_BIT) | (1<<USART_CR1_TCIE_BIT); *udr = 0; tx_enabled = true; }
+		inline void set_udrie() { *usart_cr1 |= (1<<USART_CR1_TXEIE_BIT); udrie_set = true ; }
+		inline void clear_udrie() { *usart_cr1 &= ~(1<<USART_CR1_TXEIE_BIT); udrie_set = false; }
+		RS485Slave(usart_dev *usart, uint32_t txen_pin);
+		void UsartIRQ();
+#else
 		inline void set_txen() { *ucsrb &= ~((1<<RXEN0) | (1<<RXCIE0)); *txen_port |= txen_pin_mask; *ucsrb |= (1<<TXEN0) | (1<<TXCIE0); };
 		inline void clear_txen() { *ucsrb &= ~((1<<TXEN0) | (1<<TXCIE0)); *txen_port &= ~txen_pin_mask; *ucsrb |= (1<<RXEN0) | (1<<RXCIE0); };
 		inline void tx_byte(uint8_t c) { set_txen(); *udr = c; *ucsra |= (1<<TXC0); }
@@ -88,6 +126,7 @@ namespace DcsBios {
 		inline void clear_udrie() { *ucsrb &= ~(1<<UDRIE0); }
 		
 		RS485Slave(volatile uint8_t *udr, volatile uint8_t *ucsra, volatile uint8_t *ucsrb, volatile uint8_t *ucsrc, uint8_t txen_pin);
+#endif
 	};
 	
 
