@@ -11,26 +11,39 @@ namespace DcsBios {
 			const char* msg_;
 			char pin_;
 			char lastState_;
+			char switchState_;
 			bool reverse_;
-			void init_(const char* msg, char pin, bool reverse) {
+			unsigned long debounceDelay_; 
+			unsigned long lastDebounceTime = 0;
+			void init_(const char* msg, char pin, bool reverse, unsigned long debounceDelay) {
 				msg_ = msg;
 				pin_ = pin;
 				pinMode(pin_, INPUT_PULLUP);
-				lastState_ = digitalRead(pin_);
+				switchState_ = digitalRead(pin_);
+				lastState_ = switchState_;
 				reverse_ = reverse;
+				debounceDelay_ = debounceDelay;
 			}
 			void pollInput() {
 				char state = digitalRead(pin_);
 				if (reverse_) state = !state;
 				if (state != lastState_) {
-					if (tryToSendDcsBiosMessage(msg_, state == HIGH ? "0" : "1")) {
-						lastState_ = state;
+					lastDebounceTime = millis();
+				}
+				
+				if ((millis() - lastDebounceTime) > debounceDelay_) {
+					if (state != switchState_) {
+						if (tryToSendDcsBiosMessage(msg_, state == HIGH ? "0" : "1")) {
+							switchState_ = state;
+						}
 					}
 				}
+				lastState_ = state;
 			}
 		public:
-			Switch2Pos(const char* msg, char pin, bool reverse) { init_(msg, pin, reverse); }
-			Switch2Pos(const char* msg, char pin) { init_(msg, pin, false); }
+			Switch2Pos(const char* msg, char pin, bool reverse, unsigned long debounceDelay) { init_(msg, pin, reverse, debounceDelay); }
+			Switch2Pos(const char* msg, char pin, bool reverse) { init_(msg, pin, reverse, 50); }
+			Switch2Pos(const char* msg, char pin) { init_(msg, pin, false, 50); }
 	};
 
 	
