@@ -105,6 +105,7 @@ do not come with their own build system, we are just putting everything into the
 #include "internal/Switches.h"
 #include "internal/Encoders.h"
 #include "internal/Potentiometers.h"
+#include "internal/Potentiometers_Inverted.h"
 #include "internal/Leds.h"
 #include "internal/Servos.h"
 
