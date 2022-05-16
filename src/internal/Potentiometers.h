@@ -11,11 +11,17 @@ namespace DcsBios {
 	class PotentiometerEWMA : PollingInput {
 		private:
 			void pollInput() {
+				unsigned int state;
 				unsigned char now = (unsigned char)millis();
 				if ((unsigned char)(now - lastPollTime_) < pollInterval) return;
 				lastPollTime_ = now;
 				
-				unsigned int state = map(analogRead(pin_), 0, 1023, 0, 65535);
+				if (reverse_) {
+					state = map(analogRead(pin_), 0, 1023, 65535, 0);
+				}
+				else {
+					state = map(analogRead(pin_), 0, 1023, 0, 65535);
+				}
 				accumulator += ((float)state - accumulator) / (float)ewma_divisor;
 				state = (unsigned int)accumulator;
 				
@@ -35,6 +41,7 @@ namespace DcsBios {
 			unsigned int lastState_;
 			float accumulator;
 			unsigned char lastPollTime_;
+			bool reverse_;
 			
 		public:
 			PotentiometerEWMA(const char* msg, char pin) {
@@ -42,6 +49,19 @@ namespace DcsBios {
 				pin_ = pin;
 				pinMode(pin_, INPUT);
 				lastState_ = (float)map(analogRead(pin_), 0, 1023, 0, 65535);
+				lastPollTime_ = (unsigned char)millis();
+			}
+			PotentiometerEWMA(const char* msg, char pin, bool reverse) {
+				msg_ = msg;
+				pin_ = pin;
+				reverse_ = reverse;
+				pinMode(pin_, INPUT);
+				if (reverse_) {
+					lastState_ = (float)map(analogRead(pin_), 0, 1023, 65535, 0);
+				}
+				else {
+					lastState_ = (float)map(analogRead(pin_), 0, 1023, 0, 65535);
+				}
 				lastPollTime_ = (unsigned char)millis();
 			}
 	};
